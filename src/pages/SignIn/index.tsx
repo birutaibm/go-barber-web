@@ -9,11 +9,20 @@ import logo from '../../assets/logo.svg';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import getValidationErrors from '../../utils/getValidationErrors';
+import { useAuth } from '../../hooks/auth';
+import { useToast } from '../../hooks/toast';
+
+interface SignInFormData {
+  email: string;
+  password: string;
+}
 
 const SignIn: React.FunctionComponent = () => {
   const formRef = useRef<FormHandles>(null);
+  const { signIn } = useAuth();
+  const { addToast } = useToast();
 
-  const handleSubmit = useCallback(async (data: object) => {
+  const handleSubmit = useCallback(async (data: SignInFormData) => {
     try {
       formRef.current?.setErrors({});
       const schema = Yup.object().shape({
@@ -25,10 +34,19 @@ const SignIn: React.FunctionComponent = () => {
       await schema.validate(data, {
         abortEarly: false,
       });
+
+      await signIn(data);
     } catch (err) {
-      formRef.current?.setErrors(getValidationErrors(err));
+      if (err instanceof Yup.ValidationError) {
+        formRef.current?.setErrors(getValidationErrors(err));
+      }
+      addToast({
+        type: 'error',
+        title: 'Erro na autenticação',
+        description: 'Ocorreu um erro ao fazer login, cheque as credenciais',
+      });
     }
-  }, []);
+  }, [signIn, addToast]);
 
   return (
     <Container>
