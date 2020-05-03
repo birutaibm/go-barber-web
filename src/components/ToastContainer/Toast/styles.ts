@@ -13,7 +13,7 @@ const toastTypeVariation = {
   `,
   success: css`
     background: #e6fffa;
-    color: #e2656a;
+    color: #2e656a;
   `,
   error: css`
     background: #fddede;
@@ -29,7 +29,7 @@ export const Container = styled(animated.div)<ToastProps>`
   box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
   display: flex;
 
-  ${props => toastTypeVariation[props.type || 'info']}
+  ${({type = 'info'}) => toastTypeVariation[type]}
 
   & + div {
     margin-top: 8px;

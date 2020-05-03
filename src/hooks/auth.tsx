@@ -44,7 +44,7 @@ export const AuthProvider: React.FC = ({children}) => {
   });
 
   const signIn = useCallback(async ({email, password}) => {
-    const {data} = await api.post('session', {email, password});
+    const {data} = await api.post('sessions', {email, password});
 
     const {token, user} = data;
     localStorage.setItem('@GoBarber:token', token);

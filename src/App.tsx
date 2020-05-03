@@ -1,13 +1,16 @@
 import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
 
-import SignIn from './pages/SignIn';
+import Routes from './routes';
 import GlobalStyle from './styles/global';
 import ContextProvider from './hooks'
 
 const App: React.FunctionComponent = () => {
   return (
     <ContextProvider>
-      <SignIn />
+      <Router>
+        <Routes />
+      </Router>
       <GlobalStyle />
     </ContextProvider>
   );
