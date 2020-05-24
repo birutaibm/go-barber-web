@@ -1,12 +1,19 @@
 import React from 'react';
 
-import { Container, Header, HeaderContent, Profile } from './styles';
+import { Container, Header, HeaderContent, Profile, Content, Schedule, Calendar, NextAppointment } from './styles';
 import logoImg from '../../assets/logo.svg';
-import { FiPower } from 'react-icons/fi';
+import { FiPower, FiClock } from 'react-icons/fi';
 import { useAuth } from '../../hooks/auth';
 
 const Dashboard: React.FunctionComponent = () => {
   const { signOut, user } = useAuth();
+  const appointment = {
+    user: {
+      name: 'Rafael Arantes',
+      avatar_url: 'https://avatars2.githubusercontent.com/u/19666564?v=4',
+    },
+    time: '08:00',
+  };
 
   return (
     <Container>
@@ -25,6 +32,30 @@ const Dashboard: React.FunctionComponent = () => {
           </button>
         </HeaderContent>
       </Header>
+
+      <Content>
+        <Schedule>
+          <h1>Horários agendados</h1>
+          <p>
+            <span>Hoje</span>
+            <span>Dia 24</span>
+            <span>Domingo</span>
+          </p>
+
+          <NextAppointment>
+            <strong>Atendimento a seguir</strong>
+            <div>
+              <img src={appointment.user.avatar_url} alt=""/>
+              <strong>{appointment.user.name}</strong>
+              <span>
+                <FiClock />
+                {appointment.time}
+              </span>
+            </div>
+          </NextAppointment>
+        </Schedule>
+        <Calendar />
+      </Content>
     </Container>
   );
 };
