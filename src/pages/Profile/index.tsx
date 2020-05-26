@@ -1,29 +1,31 @@
 import React, { useCallback, useRef, ChangeEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { FiMail, FiLock, FiUser, FiCamera, FiArrowLeft } from 'react-icons/fi'
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-//import * as Yup from 'yup';
+import * as Yup from 'yup';
 
 import { Container, Content, AvatarInput } from './styles';
 import api from '../../services/api';
 import { useToast } from '../../hooks/toast';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
-//import getValidationErrors from '../../utils/getValidationErrors';
+import getValidationErrors from '../../utils/getValidationErrors';
 import { useAuth } from '../../hooks/auth';
 
 interface FormData {
   name: string;
   email: string;
   password: string;
+  old_password: string;
+  password_confirmation: string;
 }
 
 const Profile: React.FunctionComponent = () => {
   const formRef = useRef<FormHandles>(null);
   const { user, updateUser } = useAuth();
   const { addToast } = useToast();
-  //const history = useHistory();
+  const history = useHistory();
 
   const handleAvatarChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -41,39 +43,57 @@ const Profile: React.FunctionComponent = () => {
   }, [updateUser, addToast]);
 
   const handleSubmit = useCallback(async (data: FormData) => {
-    /*TODO implement based in this code:
     try {
       formRef.current?.setErrors({});
       const schema = Yup.object().shape({
         name: Yup.string().required('Nome obrigatório'),
         email: Yup.string()
-        .required('E-mail obrigatório')
-        .email('Digite um e-mail válido'),
-        password: Yup.string().min(6, 'No mínimo 6 caracteres'),
+          .required('E-mail obrigatório')
+          .email('Digite um e-mail válido'),
+        old_password: Yup.string(),
+        password: Yup.string().when('old_password', {
+          is: val => val.length,
+          then: Yup.string().min(6, 'No mínimo 6 caracteres'),
+          otherwise: Yup.string().oneOf(
+            ['', null],
+            'Impossível alterar sem a senha antiga'
+          ),
+        }),
+        password_confirmation: Yup.string().oneOf(
+          [Yup.ref('password')],
+          'Confirmação incorreta',
+        ),
       });
       await schema.validate(data, {
         abortEarly: false,
       });
-      await api.post('/users', data);
+
+      if (data.password === '') {
+        delete data.old_password;
+        delete data.password;
+        delete data.password_confirmation;
+      }
+      const response = await api.put('/profile', data);
+      updateUser(response.data);
+
       addToast({
         type: 'success',
-        title: 'Cadastro realizado',
-        description: 'Você já pode fazer seu login no GoBarber',
+        title: 'Perfil atualizado',
+        description: 'Suas informações de perfil foram atualizadas com sucesso',
       });
-      history.push('/');
+      history.push('/dashboard');
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         formRef.current?.setErrors(getValidationErrors(err));
       } else {
         addToast({
           type: 'error',
-          title: 'Erro no cadastro',
+          title: 'Erro na atualização do perfil',
           description: err.message,
         });
       }
     }
-    */
-  }, [/* addToast, history */]);
+  }, [addToast, history, updateUser]);
 
   return (
     <Container>
