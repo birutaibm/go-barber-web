@@ -20,6 +20,14 @@ export const HeaderContent = styled.div`
     height: 80px;
   }
 
+  > a {
+    text-decoration: none;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
   button {
     margin-left: auto;
     background: transparent;
