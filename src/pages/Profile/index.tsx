@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { FiMail, FiLock, FiUser, FiCamera, FiArrowLeft } from 'react-icons/fi'
 import { FormHandles } from '@unform/core';
@@ -6,8 +6,8 @@ import { Form } from '@unform/web';
 //import * as Yup from 'yup';
 
 import { Container, Content, AvatarInput } from './styles';
-//import api from '../../services/api';
-//import { useToast } from '../../hooks/toast';
+import api from '../../services/api';
+import { useToast } from '../../hooks/toast';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 //import getValidationErrors from '../../utils/getValidationErrors';
@@ -21,9 +21,24 @@ interface FormData {
 
 const Profile: React.FunctionComponent = () => {
   const formRef = useRef<FormHandles>(null);
-  const { user } = useAuth();
-  //const { addToast } = useToast();
+  const { user, updateUser } = useAuth();
+  const { addToast } = useToast();
   //const history = useHistory();
+
+  const handleAvatarChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
+    if (files) {
+      const data = new FormData();
+      data.append('avatar', files[0]);
+      api.patch('/users/avatar', data).then(response => {
+        updateUser(response.data);
+        addToast({
+          type: 'success',
+          title: 'Avatar atualizado!',
+        });
+      });
+    }
+  }, [updateUser, addToast]);
 
   const handleSubmit = useCallback(async (data: FormData) => {
     /*TODO implement based in this code:
@@ -78,7 +93,10 @@ const Profile: React.FunctionComponent = () => {
         }} onSubmit={handleSubmit}>
           <AvatarInput>
             <img src={user.avatar_url} alt="Avatar"/>
-            <button type="button"><FiCamera /></button>
+            <label htmlFor="avatar">
+              <FiCamera />
+              <input type="file" name="avatar" id="avatar" onChange={handleAvatarChange} />
+            </label>
           </AvatarInput>
           <h1>Meu perfil</h1>
 
